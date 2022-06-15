@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="loan-request-decision" name="Loan Request Decision" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.10.0">
+  <decision id="LoanDecision" name="LoanDecision">
+    <decisionTable id="DecisionTable_1jiyt1g">
+      <input id="Input_1" biodi:width="192">
+        <inputExpression id="InputExpression_1" typeRef="integer">
+          <text>montant</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="status" typeRef="string" />
+      <rule id="DecisionRule_1kdvnqb">
+        <inputEntry id="UnaryTests_04o9iue">
+          <text>&gt; 100000</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1v1flo1">
+          <text>"KO"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0czp0dl">
+        <inputEntry id="UnaryTests_1gp6um3">
+          <text>&lt;= 100000</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1jaq2my">
+          <text>"OK"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="LoanDecision">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

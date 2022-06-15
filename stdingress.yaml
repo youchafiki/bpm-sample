@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bpm-sample
+  namespace: gitlab-managed-apps
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    #ingress.bluemix.net/redirect-to-https: "True"
+    nginx.ingress.kubernetes.io/ssl-redirect: "True"
+spec:
+  rules:
+  - host: bpm-sample.irblab.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: bpm-sample
+          #holymp
+          servicePort: 80
+  tls:
+    - hosts:
+      - bpm-sample.irblab.com
+      secretName: irblab-secret
+# Remove : kubectl delete -f stdingress.yaml
+# Build : kubectl apply -f stdingress.yaml

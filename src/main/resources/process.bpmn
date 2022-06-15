@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0c1nach" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="LoanRequestProcess" name="LoanRequestProcess" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_17pjsf9" sourceRef="startLoanRequest" targetRef="InitLoanRequest" />
+    <bpmn:exclusiveGateway id="Gateway_1p1dqjq">
+      <bpmn:incoming>Flow_1s7od3z</bpmn:incoming>
+      <bpmn:outgoing>statusKO</bpmn:outgoing>
+      <bpmn:outgoing>statusOK</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Event_19tbx0o">
+      <bpmn:incoming>Flow_156nk2s</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_156nk2s" sourceRef="approuverDemande" targetRef="Event_19tbx0o" />
+    <bpmn:sequenceFlow id="statusKO" name="StatusKO" sourceRef="Gateway_1p1dqjq" targetRef="rejeterDemande">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${status == 'KO'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_1ckqfdi">
+      <bpmn:incoming>Flow_1prwi9n</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1prwi9n" sourceRef="rejeterDemande" targetRef="Event_1ckqfdi" />
+    <bpmn:serviceTask id="rejeterDemande" name="RejeterDemande" camunda:class="com.example.workflow.RejectLoanRequestDelegate">
+      <bpmn:incoming>statusKO</bpmn:incoming>
+      <bpmn:outgoing>Flow_1prwi9n</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="startLoanRequest" name="startLoanRequest">
+      <bpmn:outgoing>Flow_17pjsf9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="approuverDemande" name="ApprouverDemande">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="com.example.workflow.ApproveLoanRequestListener" event="complete" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_00zp8t2</bpmn:incoming>
+      <bpmn:outgoing>Flow_156nk2s</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0odxu0y" sourceRef="InitLoanRequest" targetRef="LoanAmountDecision" />
+    <bpmn:userTask id="ValidateLoanRequest" name="ValidateLoanRequest">
+      <bpmn:extensionElements>
+        <camunda:taskListener class="com.example.workflow.ValidateLoanRequestListener" event="complete" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>statusOK</bpmn:incoming>
+      <bpmn:outgoing>Flow_00zp8t2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="InitLoanRequest" name="InitLoanRequest" camunda:class="com.example.workflow.InitLoanRequestDelegate">
+      <bpmn:incoming>Flow_17pjsf9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0odxu0y</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1s7od3z" sourceRef="LoanAmountDecision" targetRef="Gateway_1p1dqjq" />
+    <bpmn:businessRuleTask id="LoanAmountDecision" name="LoanAmountDecision" camunda:resultVariable="status" camunda:decisionRef="LoanDecision" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_0odxu0y</bpmn:incoming>
+      <bpmn:outgoing>Flow_1s7od3z</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_00zp8t2" sourceRef="ValidateLoanRequest" targetRef="approuverDemande" />
+    <bpmn:sequenceFlow id="statusOK" name="StatusOK" sourceRef="Gateway_1p1dqjq" targetRef="ValidateLoanRequest">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${status == 'OK'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="LoanRequestProcess">
+      <bpmndi:BPMNEdge id="Flow_00zp8t2_di" bpmnElement="Flow_00zp8t2">
+        <di:waypoint x="820" y="120" />
+        <di:waypoint x="900" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s7od3z_di" bpmnElement="Flow_1s7od3z">
+        <di:waypoint x="550" y="220" />
+        <di:waypoint x="615" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0odxu0y_di" bpmnElement="Flow_0odxu0y">
+        <di:waypoint x="390" y="220" />
+        <di:waypoint x="450" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1prwi9n_di" bpmnElement="Flow_1prwi9n">
+        <di:waypoint x="890" y="320" />
+        <di:waypoint x="1052" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tsn2ki_di" bpmnElement="statusKO">
+        <di:waypoint x="640" y="245" />
+        <di:waypoint x="640" y="320" />
+        <di:waypoint x="790" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="658" y="303" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_156nk2s_di" bpmnElement="Flow_156nk2s">
+        <di:waypoint x="1000" y="120" />
+        <di:waypoint x="1052" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09b36e2_di" bpmnElement="statusOK">
+        <di:waypoint x="640" y="195" />
+        <di:waypoint x="640" y="120" />
+        <di:waypoint x="720" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="658" y="102" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17pjsf9_di" bpmnElement="Flow_17pjsf9">
+        <di:waypoint x="228" y="220" />
+        <di:waypoint x="290" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1bmstkc_di" bpmnElement="InitLoanRequest">
+        <dc:Bounds x="290" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0l8ftbh_di" bpmnElement="ValidateLoanRequest">
+        <dc:Bounds x="720" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0l6oacm_di" bpmnElement="approuverDemande">
+        <dc:Bounds x="900" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19tbx0o_di" bpmnElement="Event_19tbx0o">
+        <dc:Bounds x="1052" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kqlmda_di" bpmnElement="rejeterDemande">
+        <dc:Bounds x="790" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ckqfdi_di" bpmnElement="Event_1ckqfdi">
+        <dc:Bounds x="1052" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1p1dqjq_di" bpmnElement="Gateway_1p1dqjq" isMarkerVisible="true">
+        <dc:Bounds x="615" y="195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11ky40v_di" bpmnElement="LoanAmountDecision">
+        <dc:Bounds x="450" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0t5wj5j_di" bpmnElement="startLoanRequest">
+        <dc:Bounds x="192" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="167" y="245" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
